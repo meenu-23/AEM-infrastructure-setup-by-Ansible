@@ -1,0 +1,4 @@
+[slave]
+13.126.108.85 ansible_connection=ssh ansible_ssh_user="ec2-user"
+
+13.126.108.85: <Public ip of the EC2 instance>

@@ -1,0 +1,13 @@
+---
+# tasks file for check-java-process
+#
+- hosts: localhost
+  become: yes
+  tasks:
+  - name: Java process is running or not
+    command: "pgrep java"
+    
+    register: status
+ 
+  - debug: 
+      msg: Java process id is {{ status }}

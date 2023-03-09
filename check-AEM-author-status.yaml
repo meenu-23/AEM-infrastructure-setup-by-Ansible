@@ -1,0 +1,40 @@
+---
+# tasks file for aem-service-status
+#
+- hosts: slave
+  become: yes
+  vars:
+    env: "{{ env }}"
+  tasks:
+    - name: Place AEM status script
+      copy:
+        src: /tmp/aem-author
+        dest: /etc/init.d
+        owner: root
+        group: root
+        mode: 0755
+    - name: set at boot 
+      service:
+        name: aem-author
+        state: restarted
+        enabled: yes
+        #become: yes
+ 
+ 
+    - name: Check the AEM status
+      command: "service aem-author status"
+      async: 1
+      poll: 0
+      when: env == "status"
+ 
+    - name: Start the AEM service
+      command: "service aem-author start"
+      async: 1
+      poll: 0
+      when: env == "start"
+ 
+    - name: Stop the AEM service
+      command: "service aem-author stop"
+      async: 1
+      poll: 0
+      when: env == "stop"

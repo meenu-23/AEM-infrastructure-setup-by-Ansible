@@ -1,0 +1,55 @@
+---
+# tasks file for iptables
+#
+- hosts: slave
+  become: yes
+  vars: 
+    env : "{{ env }}"
+  tasks:
+  - name: Install iptables
+    yum:
+      name: iptables
+      state: latest
+  - name: Get service facts
+    service_facts:
+ 
+  - name: Enable port on iptables for chain INPUT
+    iptables:
+       chain: INPUT
+       destination_port: "{{ item }}"
+       protocol: tcp
+       jump: ACCEPT
+    with_items:
+ 
+      - 4502
+      - 4503
+      - 80
+  - name: Enable port on iptables for chain FORWARD
+    iptables:
+       chain: FORWARD
+       destination_port: "{{ item }}"
+       protocol: tcp
+       jump: ACCEPT
+    with_items:
+ 
+      - 4502
+      - 4503
+      - 80
+  
+  - name: Enable port on iptables for chain OUTPUT
+    iptables:
+       chain: OUTPUT
+       destination_port: "{{ item }}"
+       protocol: tcp
+       jump: ACCEPT
+    with_items:
+ 
+      - 4502
+      - 4503
+      - 80
+  
+  - name: iptables flush filter
+    iptables:
+      chain: "{{ item }}"
+      flush: yes
+    with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]

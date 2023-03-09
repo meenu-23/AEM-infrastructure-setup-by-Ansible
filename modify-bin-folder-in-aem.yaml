@@ -1,0 +1,20 @@
+---
+# tasks file for edit-line-in-file
+#
+- hosts: localhost
+  become: yes
+  tasks:
+
+  - name: Replace author port with other
+    lineinfile:
+       path: /opt/AEM/Author/crx-quickstart/bin/start
+       regexp: "CQ_PORT=4502" 
+       line: "CQ_PORT=4503"
+       state: present
+
+  - name: Replace Author runmode with other
+    lineinfile: 
+       path: /opt/AEM/Author/crx-quickstart/bin/start
+       regexp: "CQ_RUNMODE='author'" 
+       line: "CQ_RUNMODE='publish'" 
+       state: present

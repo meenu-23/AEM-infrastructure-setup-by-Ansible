@@ -1,0 +1,37 @@
+---
+# tasks file for install-java
+#
+- hosts: slave
+  become: yes
+  vars:
+    download_folder: /opt
+    java_name: "{{download_folder}}/jdk1.8.0_241"
+    java_archive: "{{download_folder}}/jdk-8u241-linux-x64.tar.gz"
+ 
+  tasks: 
+    - name: Unarchive java tar file
+      command: "tar -xzvf {{ java_archive }} -C {{ download_folder }}  creates={{java_name}}"
+    - name: Create java.sh file
+      file: 
+        path: /etc/profile.d/java.sh
+        state: touch
+        mode: 0755
+        owner: root
+        group: root
+    - name: Set environment variable
+      lineinfile:
+        dest: /etc/profile.d/java.sh
+        state: present
+        #     regexp: '^JAVA_HOME'
+        line: "export JAVA_HOME=/opt/jdk1.8.0_241/bin"
+        #line: "export PATH=$PATH:/opt/jdk1.8.0_241/bin/"
+    - name: Source environment variable
+      shell: "source /etc/profile.d/java.sh"
+    
+    - name: Check java process id
+      shell: "pgrep java"
+      become: root
+      ignore_errors: true
+    - name: Check Java is installed or not
+      command: "java -version"
+      become: root

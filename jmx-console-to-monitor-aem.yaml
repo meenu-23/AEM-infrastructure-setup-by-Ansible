@@ -1,0 +1,21 @@
+---
+# tasks file for jmx
+#
+- hosts: slave
+  become: yes
+  vars:
+    replace_line: CQ_JVM_OPTS= '-server -Xmx1024m -XX:MaxPermSize=256M -Djava.awt.headless=true -Xrunjdwp:transport=dt_socket,server=y,address=30305,suspend=n -server -Xmx1024m -XX:MaxPermSize=256M -Djava.awt.headless=true -Xrunjdwp:transport=dt_socket,server=y,address=30305,suspend=n -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9990 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.rmi.port=9990 -Djava.rmi.server.hostname=192.168.56.102'
+  tasks:
+  - name: Create backup of the start file
+    copy:
+      src: /opt/author/crx-quickstart/bin/start
+      dest: /opt/
+      remote_src: yes
+ 
+  - name: Put JVM parameter for jmx inside start file
+    replace: 
+      path: /opt/author/crx-quickstart/bin/start
+      after: 'if \[ \-z \"\$CQ\_JVM\_OPTS\" \]\; then'
+      before: 'fi'
+      regexp: 'CQ_JVM_OPTS=(.*)'
+      replace: '{{ replace_line }}'

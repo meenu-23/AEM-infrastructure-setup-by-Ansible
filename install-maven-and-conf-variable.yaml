@@ -1,0 +1,47 @@
+---
+# tasks file for Maven
+#
+- hosts: slave
+  become: yes
+  vars:
+    download_folder: /opt
+    maven_name: "{{download_folder}}/apache-maven-3.6.3"
+    maven_archive: "{{download_folder}}/apache-maven-3.6.3-bin.tar.gz"
+  tasks:
+  
+    - name: Downlaod maven tar file
+      command: "wget https://www-eu.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz"
+      args:
+        chdir: /opt
+       
+        
+    - name: Unarchive maven tar file
+      command: "tar -xzvf {{ maven_archive }} -C {{ download_folder }}  creates={{maven_name}}"
+ 
+    - name: Create symlink
+      file:
+        src: /opt/apache-maven-3.6.3
+        dest: /opt/maven
+        state: link
+ 
+    - name: Create maven.sh file
+      file:
+        path: /etc/profile.d/maven.sh
+        state: touch
+        mode: 0755
+        owner: root
+        group: root
+ 
+    - name: Set environment variable
+      blockinfile:
+        path: /etc/profile.d/maven.sh
+        block: |
+          export M2_HOME=/opt/maven
+          export PATH=${M2_HOME}/bin:${PATH}
+ 
+    - name: Source environment variable
+      shell: "source /etc/profile.d/maven.sh"
+    
+    - name: Check maven version
+      command: "mvn -version"
+      become: ec2-user

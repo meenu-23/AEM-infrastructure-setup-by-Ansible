@@ -1,0 +1,41 @@
+---
+# tasks file for cache-clear
+  tasks:
+    - name: Create cache folders
+      file:
+        state: directory
+        path: /tmp/cache
+ 
+    - name: Create sub folders inside cache folder
+      file: 
+        state: directory
+        path: /tmp/cache/{{item}}
+      with_items:
+        - content
+        - en
+        - etc
+        - libs
+        - bin
+ 
+    - name: Create files inside content folder
+      file: 
+        state: touch
+        path: /tmp/cache/content/{{item}}
+      with_items:
+        - en
+        - etc
+        - abs
+ 
+ 
+    - name: delete the full cache
+      shell: "rm -rf /tmp/cache/*"
+      when: env == "full"
+ 
+    - name: delete the content
+      shell: "rm -rf /tmp/cache/'{{item}}'"
+      with_items:
+        - bin
+        - en
+        - etc
+ 
+      when: env != "full"

@@ -1,0 +1,58 @@
+---
+# tasks file for author-instance
+#
+- hosts: slave
+  become: yes
+  tasks:
+  - name: Create author folder inside opt
+    file:
+      state: directory
+      path: /opt/author
+      mode: 0755
+      owner: root
+      group: root
+   
+  - name: Copy license file inside author folder
+    copy:
+      src: /tmp/license.properties
+      dest: /opt/author
+      mode: 0755
+      owner: root
+      group: root
+  
+  - name: Copy Author jar file to slave machine
+    copy:
+      src: /tmp/cq6.5.0-author-p4502.jar
+      dest: /opt/author
+      mode: 0755
+      owner: root
+      group: root
+ 
+  - name: Unpack AEM Author instance Jar file
+    shell: "java -jar /opt/author/cq6.5.0-author-p4502.jar -unpack"
+    args:
+      chdir: /opt/author/
+    become: ec2-user
+ 
+  - name: Replace author port with our own
+    lineinfile:
+       path: /opt/author/crx-quickstart/bin/start
+       regexp: "CQ_PORT=4502" 
+       line: "CQ_PORT=4502"
+       state: present
+       
+ 
+  - name: Replace Author runmode with our own
+    lineinfile: 
+       path: /opt/author/crx-quickstart/bin/start
+       regexp: "CQ_RUNMODE='author'" 
+       line: "CQ_RUNMODE='author'" 
+       state: present
+ 
+  - name: Run AEM Author Instance
+    command: "/opt/author/crx-quickstart/bin/start"
+    async: 1
+    poll: 0
+ 
+  - name: Run iptables to open in web
+    command: "iptables -F"

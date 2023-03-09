@@ -1,0 +1,35 @@
+---
+# tasks file for httpd-backup
+- hosts: slave
+  become: yes
+  vars:
+    date: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"
+  tasks:
+  - name: Create backup folder
+    file: 
+      path: /opt/backup
+      state: directory
+      mode: 0755
+ 
+  - name: Create httpd backup folder
+    file:
+      path: /opt/backup/httpd-backup
+      state: directory
+      mode: 0755
+ 
+  - name: Create current date  inside httpd backup folder
+    file:
+      path: "/opt/backup/httpd-backup/{{ date }}"
+      state: directory
+      mode: 0755
+      owner: root
+      group: root
+ 
+  - name: Take backup of the file
+    copy:
+      src: /tmp/{{item}}
+      dest: "/opt/backup/httpd-backup/{{ date }}/{{item}}"
+    with_items:
+      - abc
+      - def
+      - xyz

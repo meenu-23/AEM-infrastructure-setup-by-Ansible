@@ -1,0 +1,42 @@
+---
+# tasks file for Git
+#
+- hosts: slave
+  become: yes
+  vars:
+    gitUser: Jerry Mouse
+    gitEmailId: jerry@gmail.com
+  tasks:
+  
+  - name: Install git
+    yum: 
+      pkg: git
+      state: latest
+  
+  - name: Install git-core
+    yum:
+      pkg: git-core
+      state: latest
+ 
+  - name: Install git dependency
+    yum: 
+      pkg: "{{item}}"
+      state: present
+    with_items:
+       - curl-devel
+       - expat-devel
+       - gettext-devel
+       - openssl-devel
+       - zlib-devel
+       - wget
+       - gcc
+       - cpan
+ 
+  - name: Get git version
+    command: "git --version"
+ 
+  - name: Set git emailid
+    command: "git config --global user.email {{ gitEmailId }}"
+ 
+  - name: Set git user
+    command: "git config --global user.name {{ gitUser }}"

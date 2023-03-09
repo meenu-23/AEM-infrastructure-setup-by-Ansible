@@ -1,0 +1,33 @@
+---
+# tasks file for user-permission
+#
+- hosts: slave
+  become: yes
+  tasks:
+ 
+  - name: Create dev group
+    group:
+      name: dev
+      state: present
+ 
+  - name: Create 3 users 
+    user:
+      name: "{{item}}"
+      groups: dev
+      state: present
+    with_items:
+      - abc
+      - xyz
+      - mno
+ 
+  - name: Change permission of all folders
+    file:
+      dest: /opt/author/crx-quickstart/*
+      mode: 0754
+      recurse: yes
+ 
+  - name: Change group and permission of logs folder
+    file:
+      dest: /opt/author/crx-quickstart/logs
+      mode: 0755
+      group: dev 

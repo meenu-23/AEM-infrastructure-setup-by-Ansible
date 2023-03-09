@@ -1,0 +1,27 @@
+---
+# tasks file for Apache
+#
+- hosts: slave
+  become: yes
+  tasks:
+ 
+  - name: Install latest Httpd version
+    yum:
+      pkg: httpd
+      state: latest
+  
+  - name: Enable apache at system reboot
+    service: 
+      name: httpd 
+      enabled: yes
+      state: restarted
+   
+  - name: get service facts
+    service_facts:
+            
+  - name: try to work out how to access the service
+    debug:
+      var: ansible_facts.services["httpd.service"]
+ 
+  - name: Pring httpd process id
+    shell: "pgrep httpd"

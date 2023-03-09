@@ -1,0 +1,22 @@
+---
+# tasks file for create-aws-ansible-machine
+
+- hosts: all
+  vars: 
+    image: ami-0a74bfeb190bd404f
+  tasks:
+  - name: launching linux AWS instance using Ansible
+    ec2_instance:
+ 
+ 
+        name: Ansible-demo1
+        key_name: "updated-ssh"
+        instance_type: t2.micro
+        security_group: default
+        aws_access_key: AKIAJJKIFCK5U5RBMQLA
+        aws_secret_key: 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
+        region: ap-south-1
+        state: started
+        validate_certs: no
+        image_id: "{{ image }}"
+        count: 1
